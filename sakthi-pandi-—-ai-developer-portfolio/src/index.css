@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-almost-black: #050505;
+    --bg-dark-black: #0A0A0A;
+    --bg-charcoal: #111111;
+    --accent-red: #E10600;
+    --accent-red-bright: #FF1717;
+  }
+
+  html,
+  body {
+    background-color: #050505;
+    color: #FFFFFF;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: clip;
+    max-width: 100vw;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #root {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+}
+
+/* Custom Typography Helpers */
+.font-display {
+  font-family: 'Syne', sans-serif;
+}
+
+.font-editorial {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-cyber {
+  font-family: 'Orbitron', 'Syne', sans-serif;
+}
+
+.font-wordmark {
+  font-family: 'Orbitron', 'Oxanium', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-feature-settings: 'ss01', 'ss02';
+}
+
+.font-xenogen {
+  font-family: 'Oxanium', 'Orbitron', 'Syne', sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.font-esports-tech {
+  font-family: 'Chakra Petch', 'Oxanium', 'Orbitron', sans-serif;
+  text-transform: uppercase;
+}
+
+.font-russo {
+  font-family: 'Russo One', 'Orbitron', sans-serif;
+  text-transform: uppercase;
+}
+
+.xenogen-text-cut {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%);
+}
+
+.logo-stencil-cut {
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* Custom Grid lines & subtle technical patterns */
+.tech-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.tech-dot-pattern {
+  background-image: radial-gradient(rgba(225, 6, 0, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Subtle glowing accents */
+.red-glow {
+  box-shadow: 0 0 35px -5px rgba(225, 6, 0, 0.35);
+}
+
+.red-glow-subtle {
+  box-shadow: 0 0 20px -3px rgba(225, 6, 0, 0.2);
+}
+
+.red-text-glow {
+  text-shadow: 0 0 20px rgba(225, 6, 0, 0.6);
+}
+
+/* Cross-browser scrollbar hiding while preserving full scrolling capabilities */
+html,
+body,
+#root,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Kinetic Marquee & Text Stroke utilities for Cinematic Intro */
+@keyframes marquee-left {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 18s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-left-fast {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 11s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 16s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right-fast {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 10s linear infinite;
+  will-change: transform;
+}
+
+.text-stroke-red {
+  -webkit-text-stroke: 1.5px #E10600;
+  color: transparent;
+}
+
+.text-stroke-white {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+  color: transparent;
+}
+
+/* Futuristic Portal Animations */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse-slow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes portal-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 24s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  animation: spin-reverse-slow 30s linear infinite;
+}
+
+.animate-portal-pulse {
+  animation: portal-pulse 3.5s ease-in-out infinite;
+}
+
+.animate-scroll-bounce {
+  animation: scroll-bounce 1.6s ease-in-out infinite;
+}
+
+.portal-radial-glow {
+  background: radial-gradient(circle at center, rgba(225, 6, 0, 0.32) 0%, rgba(139, 0, 0, 0.18) 35%, rgba(5, 5, 5, 0) 70%);
+}
+
+

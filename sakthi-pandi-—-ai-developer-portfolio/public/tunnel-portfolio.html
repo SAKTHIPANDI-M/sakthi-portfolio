@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sakthi Pandi — AI Developer Portfolio (Deep Space)</title>
+  
+  <!-- Google Fonts: Space Grotesk & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Pinned CDN Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+
+  <style>
+    /* =========================================================================
+       COLOR THEME & BASE STYLES
+       ========================================================================= */
+    :root {
+      --bg-base: #050203;
+      --accent-red: #ff2a2a;
+      --accent-glow: rgba(255, 42, 42, 0.6);
+      --line-color: rgba(255, 60, 60, 0.35);
+      --heading-color: #fff4f4;
+      --highlight-rose: #ffd0d0;
+      --body-color: #c9a9a9;
+      --mono-label: #8a6a6a;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--bg-base);
+      color: #FFFFFF;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-red) var(--bg-base);
+    }
+
+    ::selection {
+      background: var(--accent-red);
+      color: #FFFFFF;
+    }
+
+    /* Custom thin red scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #050203;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff2a2a;
+      border-radius: 2px;
+    }
+
+    /* Fixed WebGL Canvas */
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Layered Nebula Background & Vignette */
+    .nebula-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(58, 10, 15, 0.35) 0%, transparent 65%),
+        radial-gradient(circle at 25% 30%, rgba(42, 5, 8, 0.45) 0%, transparent 55%),
+        radial-gradient(circle at 75% 70%, rgba(26, 3, 6, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at center, transparent 35%, rgba(5, 2, 3, 0.92) 100%);
+    }
+
+    /* UI CHROME */
+    .ui-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      padding: clamp(16px, 3.5vw, 28px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      pointer-events: auto;
+    }
+
+    .btn-next {
+      background: none;
+      border: none;
+      color: var(--body-color);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .btn-next:hover {
+      color: var(--accent-red);
+    }
+    .btn-next-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--accent-red);
+      box-shadow: 0 0 8px var(--accent-red);
+    }
+
+    .ui-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(13px, 1.8vw, 15px);
+      letter-spacing: 0.2em;
+      color: var(--heading-color);
+    }
+
+    .ui-top-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 10px;
+    }
+
+    .btn-skip {
+      padding: 4px 10px;
+      background: #1a0507;
+      border: 1px solid rgba(255, 42, 42, 0.6);
+      color: var(--highlight-rose);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.2em;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-skip:hover {
+      background: var(--accent-red);
+      color: #FFFFFF;
+    }
+
+    .ui-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      padding: clamp(16px, 3.5vw, 28px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--mono-label);
+      pointer-events: none;
+    }
+
+    .section-rail {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .rail-dash {
+      width: 12px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      transition: width 0.25s, background 0.25s, box-shadow 0.25s;
+    }
+    .rail-dash.active {
+      width: 28px;
+      height: 2px;
+      background: var(--accent-red);
+      box-shadow: 0 0 10px var(--accent-red);
+    }
+
+    @media (max-width: 768px) {
+      .section-rail {
+        display: none;
+      }
+    }
+
+    /* SECTION LAYOUTS */
+    #sections-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(20px, 6vw, 80px);
+    }
+
+    .section-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(20px, 6vw, 80px);
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(22px);
+      transition: opacity 0.12s ease-out, filter 0.12s ease-out, transform 0.12s ease-out;
+    }
+
+    .section-grid {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    @media (min-width: 1024px) {
+      .section-grid {
+        grid-template-columns: 7fr 5fr;
+        gap: 60px;
+      }
+    }
+
+    .section-left {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .mono-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--mono-label);
+      margin-bottom: clamp(14px, 2.5vw, 24px);
+    }
+
+    .giant-heading {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: clamp(52px, 7.5vw, 120px);
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+      color: var(--heading-color);
+      margin-bottom: 24px;
+    }
+
+    .highlight-word {
+      display: block;
+      font-weight: 700;
+      color: var(--highlight-rose);
+      text-shadow: 0 0 35px rgba(255, 42, 42, 0.45);
+    }
+
+    .footnote-dim {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--mono-label);
+      opacity: 0.35;
+      margin-top: 8px;
+    }
+
+    .section-right {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    @media (min-width: 1024px) {
+      .section-right {
+        padding-top: 55px;
+      }
+    }
+
+    .body-desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(18px, 1.6vw, 22px);
+      line-height: 1.5;
+      color: var(--body-color);
+      max-width: 420px;
+    }
+
+    #scroll-cue {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: opacity 0.3s;
+    }
+    #scroll-cue.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .cue-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: rgba(10, 2, 4, 0.9);
+      border: 1px solid rgba(255, 42, 42, 0.6);
+      border-radius: 9999px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--heading-color);
+      box-shadow: 0 0 25px rgba(255, 42, 42, 0.35);
+    }
+
+    #final-flash {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      background: radial-gradient(circle at center, #ffffff 10%, #ff2a2a 60%, #050203 100%);
+      opacity: 0;
+      mix-blend-mode: screen;
+      transition: opacity 0.3s ease-out;
+    }
+
+    #tunnel-scroll-track {
+      position: relative;
+      width: 100%;
+      height: 520vh;
+      z-index: 10;
+    }
+
+    #portfolio-content {
+      position: relative;
+      z-index: 20;
+      background-color: var(--bg-base);
+      min-height: 100vh;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding: clamp(60px, 10vw, 120px) clamp(20px, 6vw, 80px);
+    }
+
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero-dossier-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #777777;
+      letter-spacing: 0.22em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 16px;
+      margin-bottom: clamp(40px, 8vw, 80px);
+    }
+
+    .hero-heading {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero-heading span.accent {
+      color: var(--accent-red);
+      text-shadow: 0 0 35px rgba(255, 42, 42, 0.7);
+    }
+
+    .hero-bio {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(15px, 2vw, 18px);
+      letter-spacing: 0.05em;
+      color: var(--body-color);
+      line-height: 1.8;
+      max-width: 780px;
+      margin-bottom: 48px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .btn-primary {
+      background-color: var(--accent-red);
+      color: #FFFFFF;
+      box-shadow: 0 0 25px rgba(255, 42, 42, 0.5);
+      border: 1px solid var(--accent-red);
+    }
+    .btn-primary:hover {
+      background-color: #ff4444;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.04);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIXED WEBGL THREE.JS CANVAS -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- LAYERED NEBULA GRADIENT -->
+  <div class="nebula-overlay"></div>
+
+  <!-- FINAL TRANSITION FLASH -->
+  <div id="final-flash"></div>
+
+  <!-- UI CHROME (FIXED OVERLAY) -->
+  <header class="ui-header">
+    <button type="button" id="btn-next" class="btn-next">
+      <span class="btn-next-dot"></span>
+      <span>NEXT <span id="next-counter">[1/6]</span></span>
+    </button>
+    <div class="ui-title">SAKTHI PANDI</div>
+    <div class="ui-top-right">
+      <span>EN</span>
+      <span>AUDIO OFF</span>
+      <button type="button" id="btn-skip" class="btn-skip">SKIP (ESC)</button>
+    </div>
+  </header>
+
+  <!-- SECTION RAIL INDICATOR -->
+  <div class="section-rail" id="section-rail">
+    <button class="rail-dash active" data-index="0"></button>
+    <button class="rail-dash" data-index="1"></button>
+    <button class="rail-dash" data-index="2"></button>
+    <button class="rail-dash" data-index="3"></button>
+    <button class="rail-dash" data-index="4"></button>
+    <button class="rail-dash" data-index="5"></button>
+  </div>
+
+  <!-- UI FOOTER -->
+  <footer class="ui-footer">
+    <div>PORTFOLIO // CHENNAI, INDIA</div>
+    <div>SAKTHI PANDI // AI DEV</div>
+  </footer>
+
+  <!-- HERO SCROLL CUE -->
+  <div id="scroll-cue">
+    <div class="cue-pill">
+      <span>SCROLL TO EXPLORE</span>
+      <span>↓</span>
+    </div>
+  </div>
+
+  <!-- SECTION OVERLAYS -->
+  <div id="sections-wrapper">
+    <!-- 01 · TODAY -->
+    <div class="section-view" id="sec-1">
+      <div class="section-grid">
+        <div class="section-left">
+          <div class="mono-tag">01 · TODAY</div>
+          <h2 class="giant-heading">
+            Hi, I'm Sakthi,
+            <span class="highlight-word">AI Developer</span>
+          </h2>
+          <div class="footnote-dim">LOCATION: CHENNAI, INDIA // B.SC CS &amp; ARTIFICIAL INTELLIGENCE</div>
+        </div>
+        <div class="section-right">
+          <p class="body-desc">
+            Computer Science with Artificial Intelligence student based in Chennai, India. Specializing in machine learning models, autonomous reasoning pipelines, and modern web architectures.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 · AUTONOMOUS SYSTEMS -->
+    <div class="section-view" id="sec-2">
+      <div class="section-grid">
+        <div class="section-left">
+          <div class="mono-tag">02 · AUTONOMOUS SYSTEMS</div>
+          <h2 class="giant-heading">
+            Intelligent
+            <span class="highlight-word">Agents</span>
+          </h2>
+          <div class="footnote-dim">TERM: RAG, RETRIEVAL-AUGMENTED GENERATION // AGENTIC ARCHITECTURES</div>
+        </div>
+        <div class="section-right">
+          <p class="body-desc">
+            Designing reasoning loops, Retrieval-Augmented Generation (RAG), and self-orchestrating multi-agent ecosystems tailored for real-world impact.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 · SKILLS -->
+    <div class="section-view" id="sec-3">
+      <div class="section-grid">
+        <div class="section-left">
+          <div class="mono-tag">03 · SKILLS &amp; TOOLKIT</div>
+          <h2 class="giant-heading">
+            Algorithms &amp;
+            <span class="highlight-word">Modern Stack</span>
+          </h2>
+          <div class="footnote-dim">STACK: PYTHON, JAVASCRIPT, PROLOG, POWER BI, VERCEL, SUPABASE, STREAMLIT</div>
+        </div>
+        <div class="section-right">
+          <p class="body-desc">
+            Engineered around Python, JavaScript, Prolog, Power BI, Scikit-learn, Vercel, Supabase, and intelligent data systems, backed by modern web technologies.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 · PROJECTS -->
+    <div class="section-view" id="sec-4">
+      <div class="section-grid">
+        <div class="section-left">
+          <div class="mono-tag">04 · SELECTED PROJECTS</div>
+          <h2 class="giant-heading">
+            Intelligent Clinical
+            <span class="highlight-word">Diagnostic Systems</span>
+          </h2>
+          <div class="footnote-dim">CASE STUDY: HEART DISEASE PREDICTION ENGINE // 8.3 CGPA MERIT</div>
+        </div>
+        <div class="section-right">
+          <p class="body-desc">
+            Built end-to-end cardiovascular risk prediction models with real-time risk stratification and automated feature importance diagnostics deployed on the cloud.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 · CONTACT -->
+    <div class="section-view" id="sec-5">
+      <div class="section-grid">
+        <div class="section-left">
+          <div class="mono-tag">05 · COLLABORATE</div>
+          <h2 class="giant-heading">
+            Ready to Build &amp;
+            <span class="highlight-word">Collaborate</span>
+          </h2>
+          <div class="footnote-dim">CONTACT: SAKTHIPANDI.OFFICIAL@GMAIL.COM // AVAILABLE 2026</div>
+        </div>
+        <div class="section-right">
+          <p class="body-desc">
+            Available for artificial intelligence and machine learning internships, research collaborations, and production software initiatives.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIRTUAL SCROLL TRACK -->
+  <div id="tunnel-scroll-track"></div>
+
+  <!-- MAIN PORTFOLIO HERO -->
+  <section id="portfolio-content">
+    <div class="hero-container">
+      <div class="hero-dossier-bar">
+        <div>SAKTHI PANDI // B.SC CS &amp; ARTIFICIAL INTELLIGENCE</div>
+        <div>S.I.V.E.T. COLLEGE // CHENNAI</div>
+        <div>CGPA: 8.3</div>
+      </div>
+
+      <h1 class="hero-heading">
+        BUILDING WITH CODE.<br />
+        THINKING WITH <span class="accent">AI.</span>
+      </h1>
+
+      <p class="hero-bio">
+        I am a Computer Science with Artificial Intelligence student and AI developer passionate about creating practical machine learning systems, autonomous agents, and high-performance digital experiences.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#projects" class="btn-action btn-primary">EXPLORE SELECTED WORK →</a>
+        <a href="mailto:sakthipandi.official@gmail.com" class="btn-action btn-secondary">GET IN TOUCH</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       THREE.JS WEBGL LOGIC (DEEP SPACE STAR VOLUME, CENTRAL CORE, NEURAL LINES)
+       ========================================================================= -->
+  <script>
+    const CONFIG = {
+      baseFov: 56,
+      starVolumeSize: 420,
+      coreRadius: 18,
+      coreRingRadius: 28,
+      neuralLineCount: 36
+    };
+
+    const SECTIONS = [
+      { id: 'hero', start: 0.0, end: 0.12, shift: { x: 0, y: 0, z: -140 } },
+      { id: 'sec-1', start: 0.15, end: 0.32, shift: { x: 18, y: -2, z: -110 } },
+      { id: 'sec-2', start: 0.35, end: 0.50, shift: { x: -22, y: -14, z: -80 } },
+      { id: 'sec-3', start: 0.53, end: 0.68, shift: { x: 24, y: 16, z: -55 } },
+      { id: 'sec-4', start: 0.71, end: 0.85, shift: { x: 14, y: -18, z: -30 } },
+      { id: 'sec-5', start: 0.88, end: 0.98, shift: { x: 0, y: 0, z: -4 } }
+    ];
+
+    let scrollProgress = 0;
+    let scrollVelocity = 0;
+    let currentActiveIdx = 0;
+
+    // WebGL Canvas & Renderer
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x050203, 0.0018);
+
+    const camera = new THREE.PerspectiveCamera(CONFIG.baseFov, window.innerWidth / window.innerHeight, 0.1, 1600);
+    camera.position.set(0, 0, 70);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x050203, 1);
+
+    // Sprite texture helper
+    const makeTex = (type) => {
+      const c = document.createElement('canvas');
+      const sz = type === 'bokeh' ? 128 : 64;
+      c.width = sz; c.height = sz;
+      const ctx = c.getContext('2d');
+      const h = sz / 2;
+      const g = ctx.createRadialGradient(h, h, 0, h, h, h);
+      if (type === 'sharp') {
+        g.addColorStop(0, '#ffffff');
+        g.addColorStop(0.25, '#ff3c3c');
+        g.addColorStop(0.6, 'rgba(196, 22, 28, 0.25)');
+        g.addColorStop(1, 'transparent');
+      } else {
+        g.addColorStop(0, '#ffd0d0');
+        g.addColorStop(0.3, '#ff2a2a');
+        g.addColorStop(0.7, 'rgba(80, 10, 15, 0.2)');
+        g.addColorStop(1, 'transparent');
+      }
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, sz, sz);
+      return new THREE.CanvasTexture(c);
+    };
+
+    const sharpTex = makeTex('sharp');
+    const softTex = makeTex('soft');
+
+    // 1. STAR VOLUME: 6,000 to 10,000 particles in 3D volume surrounding camera in all directions
+    const makeStars = (count, size, tex, op) => {
+      const pos = new Float32Array(count * 3);
+      const span = CONFIG.starVolumeSize;
+      for (let i = 0; i < count; i++) {
+        pos[i * 3] = (Math.random() - 0.5) * span;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * span;
+        pos[i * 3 + 2] = (Math.random() - 0.5) * span - 50;
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const m = new THREE.PointsMaterial({
+        size: size,
+        map: tex,
+        color: 0xff2a2a,
+        transparent: true,
+        opacity: op,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      return new THREE.Points(g, m);
+    };
+
+    const starsTiny = makeStars(6800, 1.4, sharpTex, 0.9);
+    const starsMedium = makeStars(1800, 3.2, softTex, 0.75);
+    scene.add(starsTiny);
+    scene.add(starsMedium);
+
+    // 2. CENTRAL CORE (Dense dust sphere: 15,000 tiny particles in spherical shell)
+    const coreGroup = new THREE.Group();
+    coreGroup.position.set(0, 0, -140);
+
+    const coreCount = 15000;
+    const corePos = new Float32Array(coreCount * 3);
+    for (let i = 0; i < coreCount; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = CONFIG.coreRadius + (Math.random() - 0.5) * 2.5;
+      corePos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      corePos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      corePos[i * 3 + 2] = r * Math.cos(phi);
+    }
+    const coreGeom = new THREE.BufferGeometry();
+    coreGeom.setAttribute('position', new THREE.BufferAttribute(corePos, 3));
+    const coreMat = new THREE.PointsMaterial({
+      size: 1.2,
+      map: sharpTex,
+      color: 0xff2a2a,
+      transparent: true,
+      opacity: 0.88,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true
+    });
+    const dustSphere = new THREE.Points(coreGeom, coreMat);
+    coreGroup.add(dustSphere);
+
+    // Faint thin ring & orbiter
+    const rPts = [];
+    for (let i = 0; i <= 64; i++) {
+      const t = (i / 64) * Math.PI * 2;
+      rPts.push(new THREE.Vector3(Math.cos(t) * CONFIG.coreRingRadius, Math.sin(t) * (CONFIG.coreRingRadius * 0.38), 0));
+    }
+    const coreRing = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(rPts), new THREE.LineBasicMaterial({ color: 0xff3c3c, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending }));
+    coreGroup.add(coreRing);
+
+    const orbiter = new THREE.Mesh(new THREE.SphereGeometry(1.3, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending }));
+    coreGroup.add(orbiter);
+
+    // 4. NEURAL LINES (30 to 40 radiating wiggly branching lines)
+    const neuralGroup = new THREE.Group();
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xff3c3c, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending });
+    for (let l = 0; l < CONFIG.neuralLineCount; l++) {
+      const bAngle = (l / CONFIG.neuralLineCount) * Math.PI * 2;
+      const pts = [];
+      let cR = CONFIG.coreRadius + 2;
+      let cA = bAngle;
+      pts.push(new THREE.Vector3(Math.cos(bAngle) * cR, Math.sin(bAngle) * cR, 0));
+      for (let s = 1; s <= 8; s++) {
+        cR += 14 + Math.random() * 8;
+        cA += (Math.random() - 0.5) * 0.26;
+        pts.push(new THREE.Vector3(Math.cos(cA) * cR, Math.sin(cA) * cR, (Math.random() - 0.5) * 16));
+      }
+      neuralGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+    }
+    coreGroup.add(neuralGroup);
+    scene.add(coreGroup);
+
+    // 5. HERO EDGE-LIT RING
+    const heroRingGroup = new THREE.Group();
+    const heroPts = [];
+    for (let i = 0; i <= 128; i++) {
+      const t = (i / 128) * Math.PI * 2;
+      heroPts.push(new THREE.Vector3(Math.cos(t) * 75, Math.sin(t) * 75, -10));
+    }
+    const heroRingLine = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(heroPts), new THREE.LineBasicMaterial({ color: 0xff2a2a, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending }));
+    heroRingGroup.add(heroRingLine);
+    scene.add(heroRingGroup);
+
+    // Mouse Parallax (±1.5 units opposite cursor)
+    let mouseTargetX = 0, mouseTargetY = 0;
+    let mouseCurrentX = 0, mouseCurrentY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseTargetX = -((e.clientX / window.innerWidth) * 2 - 1) * 1.5;
+      mouseTargetY = -(-(e.clientY / window.innerHeight) * 2 + 1) * 1.5;
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // RENDER LOOP
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      mouseCurrentX += (mouseTargetX - mouseCurrentX) * 0.05;
+      mouseCurrentY += (mouseTargetY - mouseCurrentY) * 0.05;
+
+      const p = scrollProgress;
+
+      // Orbiting camera choreography path
+      let shift = SECTIONS[0].shift;
+      for (let i = 0; i < SECTIONS.length - 1; i++) {
+        const cur = SECTIONS[i];
+        const next = SECTIONS[i + 1];
+        if (p >= cur.start && p <= next.end) {
+          const segT = Math.max(0, Math.min(1, (p - cur.start) / (next.start - cur.start)));
+          shift = {
+            x: THREE.MathUtils.lerp(cur.shift.x, next.shift.x, segT),
+            y: THREE.MathUtils.lerp(cur.shift.y, next.shift.y, segT),
+            z: THREE.MathUtils.lerp(cur.shift.z, next.shift.z, segT)
+          };
+          break;
+        }
+      }
+
+      coreGroup.position.x += (shift.x - coreGroup.position.x) * 0.12;
+      coreGroup.position.y += (shift.y - coreGroup.position.y) * 0.12;
+      coreGroup.position.z += (shift.z - coreGroup.position.z) * 0.12;
+
+      // Camera idle drift + parallax
+      camera.position.x = mouseCurrentX + Math.sin(elapsed * 0.35) * 1.2;
+      camera.position.y = mouseCurrentY + Math.cos(elapsed * 0.28) * 0.9;
+
+      if (p > 0.92) {
+        camera.position.z = THREE.MathUtils.lerp(70, shift.z + 5, (p - 0.92) / 0.08);
+      } else {
+        camera.position.z = 70;
+      }
+
+      camera.lookAt(coreGroup.position);
+
+      // Scroll velocity FOV widening & star stretch
+      const vel = Math.abs(scrollVelocity);
+      camera.fov = CONFIG.baseFov + Math.min(vel * 0.02, 5);
+      camera.updateProjectionMatrix();
+      starsTiny.material.size = 1.4 + Math.min(vel * 0.005, 1.2);
+
+      // Core rotation & orbiter
+      dustSphere.rotation.y = elapsed * 0.05;
+      coreRing.rotation.z = elapsed * 0.03;
+      const orbAngle = elapsed * 0.5;
+      orbiter.position.set(Math.cos(orbAngle) * CONFIG.coreRingRadius, Math.sin(orbAngle) * (CONFIG.coreRingRadius * 0.38), 0);
+
+      // Hero ring scales outward & fades
+      const rScale = 1 + p * 3.6;
+      heroRingGroup.scale.set(rScale, rScale, 1);
+      heroRingLine.material.opacity = Math.max(0, 1 - p * 3.2) * 0.85;
+
+      // Ambient drift
+      starsTiny.rotation.y = elapsed * 0.006;
+      starsMedium.rotation.y = -elapsed * 0.004;
+
+      scrollVelocity *= 0.9;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // LENIS SMOOTH SCROLL
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      syncTouch: true
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    const scrollCueEl = document.getElementById('scroll-cue');
+    const finalFlashEl = document.getElementById('final-flash');
+
+    ScrollTrigger.create({
+      trigger: '#tunnel-scroll-track',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (self) => {
+        scrollProgress = self.progress;
+        scrollVelocity = self.getVelocity() || 0;
+
+        if (self.progress > 0.06) scrollCueEl.classList.add('hide');
+        else scrollCueEl.classList.remove('hide');
+
+        if (self.progress > 0.92) {
+          finalFlashEl.style.opacity = Math.min(1, (self.progress - 0.92) * 12.5);
+        } else {
+          finalFlashEl.style.opacity = 0;
+        }
+
+        // Section views: FULLY SHARP while active, blur/fade only during edge transitions
+        SECTIONS.slice(1).forEach((sec, idx) => {
+          const el = document.getElementById(sec.id);
+          if (!el) return;
+
+          const span = sec.end - sec.start;
+          const edge = span * 0.22;
+          let op = 0;
+          let blur = 8;
+          let transY = 18;
+
+          if (self.progress >= sec.start && self.progress <= sec.end) {
+            const fromStart = self.progress - sec.start;
+            const fromEnd = sec.end - self.progress;
+
+            if (fromStart < edge) {
+              const t = fromStart / edge;
+              op = t;
+              blur = (1 - t) * 6;
+              transY = (1 - t) * 16;
+            } else if (fromEnd < edge) {
+              const t = fromEnd / edge;
+              op = t;
+              blur = (1 - t) * 6;
+              transY = (1 - t) * -16;
+            } else {
+              op = 1.0;
+              blur = 0;
+              transY = 0;
+            }
+          }
+
+          el.style.opacity = op;
+          el.style.filter = blur > 0.1 ? `blur(${blur}px)` : 'none';
+          el.style.transform = `translateY(${transY}px)`;
+
+          if (self.progress >= sec.start && self.progress <= sec.end) {
+            currentActiveIdx = idx + 1;
+          }
+        });
+
+        if (self.progress < 0.12) currentActiveIdx = 0;
+
+        // Rail indicators & next counter
+        document.getElementById('next-counter').textContent = `[${currentActiveIdx + 1}/6]`;
+        const dashes = document.querySelectorAll('.rail-dash');
+        dashes.forEach((d, i) => {
+          if (i === currentActiveIdx) d.classList.add('active');
+          else d.classList.remove('active');
+        });
+      }
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      const nextIdx = Math.min(SECTIONS.length - 1, currentActiveIdx + 1);
+      const totalH = document.getElementById('tunnel-scroll-track').scrollHeight - window.innerHeight;
+      lenis.scrollTo((SECTIONS[nextIdx].start + 0.04) * totalH, { duration: 1.4 });
+    });
+
+    document.querySelectorAll('.rail-dash').forEach((d) => {
+      d.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+        const totalH = document.getElementById('tunnel-scroll-track').scrollHeight - window.innerHeight;
+        lenis.scrollTo((SECTIONS[idx].start + 0.04) * totalH, { duration: 1.4 });
+      });
+    });
+
+    document.getElementById('btn-skip').addEventListener('click', () => {
+      document.getElementById('portfolio-content').scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
